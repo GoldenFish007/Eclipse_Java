@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class StudentDao {
 	
-	
+	private Student stdStudent; 
 
 	public int insert(Student stud) throws SQLException {
 
@@ -189,13 +189,14 @@ public class StudentDao {
 			ptmt = con.prepareStatement("SELECT * FROM students");
 
 			resultSet = ptmt.executeQuery();
-
+			
 			int count = 0;
 			while (resultSet.next()) {
 
 				System.out.println("ID = " + resultSet.getInt("id") + "  " + " FirstName = "
 						+ resultSet.getString("firstname") + "  " + " LastName = " + resultSet.getString("lastname")
 						+ "  " + " Age = " + resultSet.getInt("age"));
+				count++;
 			}
 			if (count == 0)
 				System.out.print("The data base is empty");
@@ -215,5 +216,17 @@ public class StudentDao {
 			}
 		}
 	}
+	
+	public Student createStudent (String first, String second, int age) {
+		
+		stdStudent = new Student();
+		
+		stdStudent.setFirstName(first);
+		stdStudent.setLastName(second);
+		stdStudent.setAge(age);
+		
+		return stdStudent;
+	}
+
 
 }

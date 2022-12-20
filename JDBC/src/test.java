@@ -12,12 +12,10 @@ public class test {
 
 		int result = 10;
 
-		student.setFirstName("Real");
-		student.setLastName("Updated");
-		student.setAge(24);
+		student =dao.createStudent("Luis", "johnson", 30);
 
 	//	result = dao.insert(student);
-	//	result = dao.delete(12);
+	//	result = dao.delete(13);
 	//	result = dao.update(student, 30);
 	//	dao.select(student);
 	//	dao.selectAll();
