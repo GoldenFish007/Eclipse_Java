@@ -9,21 +9,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class StudentDao {
-
-	private Connection con = null;
-	private PreparedStatement ptmt = null;
-	private ResultSet resultSet = null;
-
-	private String sql = null;
-	private int result = 0;
+	
+	
 
 	public int insert(Student stud) throws SQLException {
+
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		int result = 0;
 
 		try {
 
 			con = ConnectionManager.getConnection();
-			sql = "INSERT INTO students(firstname, lastname, age) VALUES(?,?,?)";
-			ptmt = con.prepareStatement(sql);
+			ptmt = con.prepareStatement("INSERT INTO students(firstname, lastname, age) VALUES(?,?,?)");
 
 			ptmt.setString(1, stud.getFirstName());
 			ptmt.setString(2, stud.getLastName());
@@ -52,11 +50,15 @@ public class StudentDao {
 	}
 
 	public int update(Student stud, int id) throws SQLException {
+
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		int result = 0;
+
 		try {
 
 			con = ConnectionManager.getConnection();
-			sql = "UPDATE students SET firstname=?, lastname=?, Age=? WHERE id=?";
-			ptmt = con.prepareStatement(sql);
+			ptmt = con.prepareStatement("UPDATE students SET firstname=?, lastname=?, Age=? WHERE id=?");
 
 			ptmt.setString(1, stud.getFirstName());
 			ptmt.setString(2, stud.getLastName());
@@ -91,11 +93,14 @@ public class StudentDao {
 
 	public int delete(int id) throws SQLException {
 
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		int result = 0;
+
 		try {
 
 			con = ConnectionManager.getConnection();
-			sql = "DELETE FROM students WHERE id=?";
-			ptmt = con.prepareStatement(sql);
+			ptmt = con.prepareStatement("DELETE FROM students WHERE id=?");
 
 			ptmt.setInt(1, id);
 
@@ -127,11 +132,14 @@ public class StudentDao {
 
 	public void select(Student std) throws SQLException {
 
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		ResultSet resultSet = null;
+
 		try {
 
 			con = ConnectionManager.getConnection();
-			sql = "SELECT * FROM students WHERE firstname=? AND lastname=? AND Age=?";
-			ptmt = con.prepareStatement(sql);
+			ptmt = con.prepareStatement("SELECT * FROM students WHERE firstname=? AND lastname=? AND Age=?");
 
 			ptmt.setString(1, std.getFirstName());
 			ptmt.setString(2, std.getLastName());
@@ -171,11 +179,14 @@ public class StudentDao {
 
 	public void selectAll() throws SQLException {
 
+		Connection con = null;
+		PreparedStatement ptmt = null;
+		ResultSet resultSet = null;
+
 		try {
 
 			con = ConnectionManager.getConnection();
-			String sql = "SELECT * FROM students";
-			ptmt = con.prepareStatement(sql);
+			ptmt = con.prepareStatement("SELECT * FROM students");
 
 			resultSet = ptmt.executeQuery();
 
