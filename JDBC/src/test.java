@@ -10,7 +10,7 @@ public class test {
 		Student student = new Student();
 		StudentDao dao = new StudentDao();
 
-		int result = 0;
+		int result = 10;
 
 		student.setFirstName("Real");
 		student.setLastName("Updated");
