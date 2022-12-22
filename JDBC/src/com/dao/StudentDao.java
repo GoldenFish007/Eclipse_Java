@@ -1,33 +1,41 @@
 package com.dao;
 
-import com.connection.ConnectionManager;
-import com.entities.Student;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.connection.ConnectionManager;
+import com.entities.Student;
 
 public class StudentDao {
 	
-	private Student stdStudent; 
-
-	public int insert(Student stud) throws SQLException {
+	public static Student insert(Student stud) throws SQLException {
 
 		Connection con = null;
 		PreparedStatement ptmt = null;
-		int result = 0;
+		ResultSet rs = null;
+
+		if (stud.getFirstName() == null || stud.getLastName() == null)
+			throw new IllegalArgumentException("invalid inputs");
 
 		try {
 
+			String sqlString = "INSERT INTO students(firstname, lastname, age) VALUES(?,?,?)";
 			con = ConnectionManager.getConnection();
-			ptmt = con.prepareStatement("INSERT INTO students(firstname, lastname, age) VALUES(?,?,?)");
+			ptmt = con.prepareStatement(sqlString, PreparedStatement.RETURN_GENERATED_KEYS);
 
 			ptmt.setString(1, stud.getFirstName());
 			ptmt.setString(2, stud.getLastName());
 			ptmt.setInt(3, stud.getAge());
 
-			result = ptmt.executeUpdate();
+			ptmt.execute();
+			rs = ptmt.getGeneratedKeys();
+
+			if (rs.next())
+				stud.setId(rs.getInt(1));
 
 			System.out.println("Data Added Successfully");
 
@@ -46,10 +54,10 @@ public class StudentDao {
 				e.printStackTrace();
 			}
 		}
-		return result;
+		return stud;
 	}
 
-	public int update(Student stud, int id) throws SQLException {
+	public static int update(Student stud) throws SQLException {
 
 		Connection con = null;
 		PreparedStatement ptmt = null;
@@ -63,7 +71,7 @@ public class StudentDao {
 			ptmt.setString(1, stud.getFirstName());
 			ptmt.setString(2, stud.getLastName());
 			ptmt.setInt(3, stud.getAge());
-			ptmt.setInt(4, id);
+			ptmt.setInt(4, stud.getId());
 
 			result = ptmt.executeUpdate();
 
@@ -86,12 +94,12 @@ public class StudentDao {
 		if (result != 0)
 			System.out.println("Table Updated Successfully");
 		else
-			System.out.println("There is no such student identified by the id " + id);
+			System.out.println("There is no such student identified by the id " + stud.getId());
 
 		return result;
 	}
 
-	public int delete(int id) throws SQLException {
+	public static int delete(int id) throws SQLException {
 
 		Connection con = null;
 		PreparedStatement ptmt = null;
@@ -130,76 +138,57 @@ public class StudentDao {
 		return result;
 	}
 
-	public void select(Student std) throws SQLException {
+	public static List<Student> select(Student std) throws SQLException {
 
 		Connection con = null;
 		PreparedStatement ptmt = null;
 		ResultSet resultSet = null;
+		Student student = null;
+		List<Student> rs = null;
+		int current = 1;
 
 		try {
 
 			con = ConnectionManager.getConnection();
-			ptmt = con.prepareStatement("SELECT * FROM students WHERE firstname=? AND lastname=? AND Age=?");
+			String sqlString = "SELECT * FROM students WHERE 1=1";
 
-			ptmt.setString(1, std.getFirstName());
-			ptmt.setString(2, std.getLastName());
-			ptmt.setInt(3, std.getAge());
+			if (std.getFirstName() != null)
+				sqlString += " AND firstname = ?";
 
-			resultSet = ptmt.executeQuery();
+			if (std.getLastName() != null)
+				sqlString += " AND lastname = ?";
 
-			int count = 0;
-			while (resultSet.next()) {
+			if (std.getAge() != 0)
+				sqlString += " AND Age = ?";
 
-				System.out.println("ID = " + resultSet.getInt("id") + "  " + " FirstName = "
-						+ resultSet.getString("firstname") + "  " + " LastName = " + resultSet.getString("lastname")
-						+ "  " + " Age = " + resultSet.getInt("age"));
-				count++;
+			ptmt = con.prepareStatement(sqlString);
 
-			}
+			if (std.getFirstName() != null)
+				ptmt.setString(current++, std.getFirstName());
 
-			if (count == 0)
-				System.out.print("There is no such student in the data base ");
+			if (std.getLastName() != null)
+				ptmt.setString(current++, std.getLastName());
 
-		} finally {
-			try {
-				if (ptmt != null)
-					ptmt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				if (con != null)
-					con.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void selectAll() throws SQLException {
-
-		Connection con = null;
-		PreparedStatement ptmt = null;
-		ResultSet resultSet = null;
-
-		try {
-
-			con = ConnectionManager.getConnection();
-			ptmt = con.prepareStatement("SELECT * FROM students");
-
+			if (std.getAge() != 0)
+				ptmt.setInt(current++, std.getAge());
+			
 			resultSet = ptmt.executeQuery();
 			
-			int count = 0;
 			while (resultSet.next()) {
-
-				System.out.println("ID = " + resultSet.getInt("id") + "  " + " FirstName = "
-						+ resultSet.getString("firstname") + "  " + " LastName = " + resultSet.getString("lastname")
-						+ "  " + " Age = " + resultSet.getInt("age"));
-				count++;
+				
+				student = new Student();
+				
+				student.setId(resultSet.getInt("id"));
+				student.setFirstName(resultSet.getString("firstname"));
+				student.setLastName(resultSet.getString("lastname"));
+				student.setAge(resultSet.getInt("Age"));
+				
+				rs = new ArrayList<>();
+				rs.add(student);
+				
+				System.out.print(student.toString());
 			}
-			if (count == 0)
-				System.out.print("The data base is empty");
+			
 		} finally {
 			try {
 				if (ptmt != null)
@@ -215,18 +204,8 @@ public class StudentDao {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	public Student createStudent (String first, String second, int age) {
-		
-		stdStudent = new Student();
-		
-		stdStudent.setFirstName(first);
-		stdStudent.setLastName(second);
-		stdStudent.setAge(age);
-		
-		return stdStudent;
-	}
 
+		return rs;
+	}
 
 }
