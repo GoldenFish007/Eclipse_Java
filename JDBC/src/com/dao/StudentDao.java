@@ -18,13 +18,13 @@ public class StudentDao {
 		PreparedStatement ptmt = null;
 		ResultSet rs = null;
 
-		if (stud.getFirstName() == null || stud.getLastName() == null)
+		if (stud.getFirstName() == null || stud.getLastName() == null || stud.getAge() == 0)
 			throw new IllegalArgumentException("invalid inputs");
 
 		try {
 
-			String sqlString = "INSERT INTO students(firstname, lastname, age) VALUES(?,?,?)";
 			con = ConnectionManager.getConnection();
+			String sqlString = "INSERT INTO students(firstname, lastname, age) VALUES(?,?,?)";
 			ptmt = con.prepareStatement(sqlString, PreparedStatement.RETURN_GENERATED_KEYS);
 
 			ptmt.setString(1, stud.getFirstName());
